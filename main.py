@@ -19,6 +19,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 tz = pytz.timezone(FUSO_HORARIO)
+tz_servidor = pytz.timezone("Europe/Lisbon")  # GMT+1 — fuso do servidor MU Dream
 
 BOSSES_FIXOS = {
     "White Wizard": {
@@ -119,7 +120,9 @@ def proximo_respawn_fixo(boss_nome):
     proximos = []
     for h in BOSSES_FIXOS[boss_nome]["horarios"]:
         hora, minuto = map(int, h.split(":"))
-        dt = agora.replace(hour=hora, minute=minuto, second=0, microsecond=0)
+        # Horário do boss está em GMT+1 (servidor), converte pra horário de Brasília
+        dt_servidor = datetime.now(tz_servidor).replace(hour=hora, minute=minuto, second=0, microsecond=0)
+        dt = dt_servidor.astimezone(tz)
         if dt <= agora:
             dt += timedelta(days=1)
         proximos.append(dt)
