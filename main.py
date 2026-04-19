@@ -21,17 +21,69 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 tz = pytz.timezone(FUSO_HORARIO)
 
 BOSSES_FIXOS = {
-    "Death Bone": {"local": "Shadow Abyss", "horarios": ["21:45", "00:45", "03:45", "06:45"], "emoji": "💀"},
-    "Cursed Santa": {"local": "Devias", "horarios": ["02:35", "08:35", "14:35", "20:35"], "emoji": "🎅"},
+    "White Wizard": {
+        "local": "Noria",
+        "horarios": ["09:45", "12:45", "15:45", "18:45"],
+        "emoji": "🧙",
+        "imagem": "https://dreamassets.fra1.digitaloceanspaces.com/images/125/body/7NJ6PW2Az1QucmJeMCXyN.gif"
+    },
+    "Death Bone": {
+        "local": "Shadow Abyss",
+        "horarios": ["21:45", "00:45", "03:45", "06:45"],
+        "emoji": "💀",
+        "imagem": "https://dreamassets.fra1.digitaloceanspaces.com/images/126/body/-GwVeKpTYRMlJCyC5IAP0.gif"
+    },
+    "Red Dragon": {
+        "local": "Aida",
+        "horarios": ["08:00", "20:00"],
+        "emoji": "🐉",
+        "imagem": "https://dreamassets.fra1.digitaloceanspaces.com/images/128/body/9glyr72i5m_9nR73DihnY.gif"
+    },
+    "Cursed Santa": {
+        "local": "Devias",
+        "horarios": ["02:35", "08:35", "14:35", "20:35"],
+        "emoji": "🎅",
+        "imagem": "https://dreamassets.fra1.digitaloceanspaces.com/images/129/body/KuggfdVhYaPT8nQe7yvJs.gif"
+    },
 }
 
 BOSSES_TIMER = {
-    "Kharzul":       {"local": "Ruined Lorencia",    "horas_min": 7,  "horas_max": 8,  "emoji": "👹"},
-    "Vescrya":       {"local": "Ruined Devias",      "horas_min": 7,  "horas_max": 8,  "emoji": "🦇"},
-    "Muggron":       {"local": "Crywolf / Barracks", "horas_min": 7,  "horas_max": 8,  "emoji": "👑"},
-    "Blue Goblin":   {"local": "Shadow Abyss",       "horas_min": 10, "horas_max": 11, "emoji": "👺"},
-    "Red Goblin":    {"local": "Shadow Abyss",       "horas_min": 10, "horas_max": 11, "emoji": "🔴"},
-    "Yellow Goblin": {"local": "Shadow Abyss",       "horas_min": 10, "horas_max": 11, "emoji": "🟡"},
+    "Kharzul": {
+        "local": "Ruined Lorencia",
+        "horas_min": 7, "horas_max": 8,
+        "emoji": "👹",
+        "imagem": "https://dreamassets.fra1.digitaloceanspaces.com/images/453/body/Bbx9qKp9RyqcsLosn5l45.gif"
+    },
+    "Vescrya": {
+        "local": "Ruined Devias",
+        "horas_min": 7, "horas_max": 8,
+        "emoji": "🦇",
+        "imagem": "https://dreamassets.fra1.digitaloceanspaces.com/images/454/body/fNaLVB03_Yag-EEYo0rTu.gif"
+    },
+    "Muggron": {
+        "local": "Crywolf / Barracks",
+        "horas_min": 7, "horas_max": 8,
+        "emoji": "👑",
+        "imagem": "https://dreamassets.fra1.digitaloceanspaces.com/images/455/body/-4Ydi-xNXdkqPiSqscZFg.gif"
+    },
+    "Blue Goblin": {
+        "local": "Shadow Abyss",
+        "horas_min": 10, "horas_max": 11,
+        "emoji": "👺",
+        "imagem": "https://dreamassets.fra1.digitaloceanspaces.com/images/130/body/KGFS9oHVg86g3scURC_pT.gif"
+    },
+    "Red Goblin": {
+        "local": "Shadow Abyss",
+        "horas_min": 10, "horas_max": 11,
+        "emoji": "🔴",
+        "imagem": "https://dreamassets.fra1.digitaloceanspaces.com/images/131/body/1G8R8SRuCKAv-zIaMTHTm.gif"
+    },
+    "Yellow Goblin": {
+        "local": "Shadow Abyss",
+        "horas_min": 10, "horas_max": 11,
+        "emoji": "🟡",
+        "imagem": "https://dreamassets.fra1.digitaloceanspaces.com/images/132/body/TSGbd-o6Xgbxn7Kq0kASS.gif"
+    },
 }
 
 ARQUIVO_DADOS  = "boss_timers.json"
@@ -80,8 +132,8 @@ def tempo_faltando(dt_futuro):
     total_segundos = int(diff.total_seconds())
     if total_segundos <= 0:
         return "**AGORA!** 🚨"
-    horas   = total_segundos // 3600
-    minutos = (total_segundos % 3600) // 60
+    horas    = total_segundos // 3600
+    minutos  = (total_segundos % 3600) // 60
     segundos = total_segundos % 60
     if horas > 0:
         return f"{horas}h {minutos}min"
@@ -129,7 +181,6 @@ def build_painel_embed():
 
 
 def registrar_morte(boss_nome, horario_morte: datetime):
-    """Salva o respawn calculado a partir do horário da morte."""
     info = BOSSES_TIMER[boss_nome]
     dt_respawn = horario_morte + timedelta(hours=info["horas_min"])
     dados = carregar_dados()
@@ -163,8 +214,6 @@ class ModalHorarioManual(ui.Modal, title="Registrar horário da morte"):
 
         agora = datetime.now(tz)
         horario_morte = agora.replace(hour=hora, minute=minuto, second=0, microsecond=0)
-
-        # Se o horário informado for "no futuro", assume que foi ontem
         if horario_morte > agora:
             horario_morte -= timedelta(days=1)
 
@@ -175,15 +224,16 @@ class ModalHorarioManual(ui.Modal, title="Registrar horário da morte"):
             title=f"{info['emoji']} {self.boss_nome} foi derrotado!",
             color=discord.Color.red()
         )
-        embed.add_field(name="📍 Local",           value=info["local"],                        inline=True)
-        embed.add_field(name="💀 Morreu às",        value=horario_morte.strftime("%H:%M"),      inline=True)
-        embed.add_field(name="⏰ Próximo respawn",  value=dt_respawn.strftime("%H:%M"),         inline=True)
-        embed.add_field(name="⏱️ Tempo",            value=f"~{info['horas_min']}h - {info['horas_max']}h", inline=True)
+        embed.set_thumbnail(url=info["imagem"])
+        embed.add_field(name="📍 Local",          value=info["local"],                              inline=True)
+        embed.add_field(name="💀 Morreu às",       value=horario_morte.strftime("%H:%M"),            inline=True)
+        embed.add_field(name="⏰ Próximo respawn", value=dt_respawn.strftime("%H:%M"),               inline=True)
+        embed.add_field(name="⏱️ Tempo",           value=f"~{info['horas_min']}h - {info['horas_max']}h", inline=True)
         embed.set_footer(text=f"Registrado às {agora.strftime('%H:%M:%S')} (horário ajustado)")
         await interaction.response.send_message(embed=embed)
 
 
-# ─── View: botões Matei agora / Matei em outro horário ───────
+# ─── View: botões ────────────────────────────────────────────
 
 class ViewMorreu(ui.View):
     def __init__(self, boss_nome: str):
@@ -200,8 +250,9 @@ class ViewMorreu(ui.View):
             title=f"{info['emoji']} {self.boss_nome} foi derrotado!",
             color=discord.Color.red()
         )
-        embed.add_field(name="📍 Local",          value=info["local"],                        inline=True)
-        embed.add_field(name="⏰ Próximo respawn", value=dt_respawn.strftime("%H:%M"),         inline=True)
+        embed.set_thumbnail(url=info["imagem"])
+        embed.add_field(name="📍 Local",          value=info["local"],                              inline=True)
+        embed.add_field(name="⏰ Próximo respawn", value=dt_respawn.strftime("%H:%M"),               inline=True)
         embed.add_field(name="⏱️ Tempo",           value=f"~{info['horas_min']}h - {info['horas_max']}h", inline=True)
         embed.set_footer(text=f"Registrado às {agora.strftime('%H:%M:%S')}")
         self.stop()
@@ -264,9 +315,9 @@ async def boss_morreu(ctx, *, nome_boss: str = None):
         description="Quando o boss morreu?",
         color=discord.Color.orange()
     )
-    embed.add_field(name="📍 Local", value=info["local"], inline=True)
+    embed.set_thumbnail(url=info["imagem"])
+    embed.add_field(name="📍 Local",    value=info["local"],                              inline=True)
     embed.add_field(name="⏱️ Respawn", value=f"~{info['horas_min']}h - {info['horas_max']}h", inline=True)
-
     await ctx.send(embed=embed, view=ViewMorreu(boss_encontrado))
 
 
@@ -308,9 +359,10 @@ async def quando_respawn(ctx, *, nome_boss: str = None):
             proximo = proximo_respawn_fixo(nome)
             faltando = tempo_faltando(proximo)
             embed = discord.Embed(title=f"{info['emoji']} {nome}", color=discord.Color.blue())
-            embed.add_field(name="📍 Local",          value=info["local"],              inline=True)
-            embed.add_field(name="⏰ Próximo respawn", value=proximo.strftime("%H:%M"), inline=True)
-            embed.add_field(name="⏱️ Faltam",          value=faltando,                  inline=True)
+            embed.set_thumbnail(url=info["imagem"])
+            embed.add_field(name="📍 Local",             value=info["local"],              inline=True)
+            embed.add_field(name="⏰ Próximo respawn",   value=proximo.strftime("%H:%M"),  inline=True)
+            embed.add_field(name="⏱️ Faltam",             value=faltando,                  inline=True)
             embed.add_field(name="🗓️ Todos os horários", value=" | ".join(info["horarios"]), inline=False)
             await ctx.send(embed=embed)
             return
@@ -324,9 +376,10 @@ async def quando_respawn(ctx, *, nome_boss: str = None):
             dt_respawn = datetime.fromisoformat(dados[nome]).astimezone(tz)
             faltando = tempo_faltando(dt_respawn)
             embed = discord.Embed(title=f"{info['emoji']} {nome}", color=discord.Color.orange())
-            embed.add_field(name="📍 Local",             value=info["local"],                   inline=True)
-            embed.add_field(name="⏰ Respawn estimado",  value=dt_respawn.strftime("%H:%M"),    inline=True)
-            embed.add_field(name="⏱️ Faltam",             value=faltando,                        inline=True)
+            embed.set_thumbnail(url=info["imagem"])
+            embed.add_field(name="📍 Local",            value=info["local"],                inline=True)
+            embed.add_field(name="⏰ Respawn estimado", value=dt_respawn.strftime("%H:%M"), inline=True)
+            embed.add_field(name="⏱️ Faltam",            value=faltando,                    inline=True)
             await ctx.send(embed=embed)
             return
 
@@ -369,6 +422,7 @@ async def verificar_respawns():
                     description=f"📍 Vá para **{info['local']}**!",
                     color=discord.Color.yellow() if aviso == 10 else discord.Color.red()
                 )
+                embed.set_thumbnail(url=info["imagem"])
                 embed.add_field(name="⏰ Hora do respawn", value=proximo.strftime("%H:%M"), inline=True)
                 embed.set_footer(text=f"Horário atual: {agora.strftime('%H:%M')}")
                 await canal.send(mencao, embed=embed)
@@ -381,6 +435,7 @@ async def verificar_respawns():
                 description=f"📍 Corra para **{info['local']}**!",
                 color=discord.Color.green()
             )
+            embed.set_thumbnail(url=info["imagem"])
             await canal.send(mencao, embed=embed)
 
     dados = carregar_dados()
@@ -398,6 +453,7 @@ async def verificar_respawns():
                     description=f"📍 Vá para **{info['local']}**!",
                     color=discord.Color.yellow() if aviso == 10 else discord.Color.red()
                 )
+                embed.set_thumbnail(url=info["imagem"])
                 embed.add_field(name="⏰ Respawn estimado", value=dt_respawn.strftime("%H:%M"), inline=True)
                 await canal.send(mencao, embed=embed)
 
@@ -409,6 +465,7 @@ async def verificar_respawns():
                 description=f"📍 Vá para **{info['local']}**!",
                 color=discord.Color.green()
             )
+            embed.set_thumbnail(url=info["imagem"])
             await canal.send(mencao, embed=embed)
             del dados[nome]
             salvar_dados(dados)
